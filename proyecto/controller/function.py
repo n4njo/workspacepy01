@@ -70,8 +70,6 @@ def GetDatasourceOrders(conn):
     df_newOrders=df_newOrders[['Order ID','Postal Code','id','Sales','Quantity','Discount','Profit','Shipping Cost','Order Priority']]
     list_tuples=[tuple(x) for x in df_newOrders.to_records(index=False)]
     return list_tuples
-    
-    return list_tuples
 
 def createTableVentas(conn):
     ventas=Ventas()
