@@ -29,11 +29,9 @@ class Database:
         placeholders = ", ".join(["?"] * len(columns))
         query = f"INSERT INTO {table} ({column_names}) VALUES ({placeholders})"
 
-        # Inicializar la barra de progreso
         with Progress() as progress:
             task = progress.add_task(f"[green]Insertando datos en {table}...", total=num_batches)
 
-            # Insertar datos por lotes
             for i in range(num_batches):
                 batch = data[i * MAX_BATCH_SIZE : (i + 1) * MAX_BATCH_SIZE]
                 if batch:
@@ -41,7 +39,6 @@ class Database:
                     cursor.executemany(query, batch)
                     self.conection.commit()
                 
-                # Avanzar la barra de progreso
                 progress.update(task, advance=1)
 
         print(f"✅ {len(data)} filas insertadas en '{table}'.")

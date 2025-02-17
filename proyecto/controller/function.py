@@ -1,7 +1,6 @@
 from sqlite3 import Connection
 import pandas as pd
 
-#importacion como si se llamara desde el archivo principal
 from config.app import *
 from modelos.model import *
 
