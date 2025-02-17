@@ -8,8 +8,8 @@ class App:
         stmp_server,port,user,password=[
                 'sandbox.smtp.mailtrap.io',
                 2525,
-                '9a3c8223168f67',
-                '367b96da6a548b'
+                'ef5fb620821dab',
+                '88eccce857c667'
                 ]
         self.bd:Database=Database(path)        
         self.mail=Mail(stmp_server,port,user,password)

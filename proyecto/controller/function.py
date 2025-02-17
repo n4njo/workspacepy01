@@ -17,7 +17,7 @@ def IngestDataProducts(app:App):
     dataVentas=GetDatasourceOrders(conn)
     createTableVentas(conn)
     insertManyVentas(bd,dataVentas)
-    datafecha=GetDatasourceFecha(conn)
+    datafecha=GetDatasourceFecha()
     createTableFecha(conn)
     InsertManyFecha(bd,datafecha)
 
@@ -57,13 +57,19 @@ def InsertManyProducts(bd:Database,data):
     bd.insert_many('PRODUCTOS',['product_id','name','category_id'],data)
 
 
-def GetDatasourceOrders(conn): 
-    pathData = "/workspaces/workspacepy01/proyecto/files/data.xls"
-    df = pd.read_excel(pathData, sheet_name="Orders")
-    df_orders = df[['Order ID', 'Postal Code', 'Product ID', 'Sales', 'Quantity', 'Discount', 'Profit', 'Shipping Cost', 'Order Priority']].dropna().drop_duplicates()
+def GetDatasourceOrders(conn):
+    pathData="/workspaces/workspacepy01/proyecto/files/data.xls"
+    df=pd.read_excel(pathData,sheet_name="Orders")
+    df_products=pd.read_sql_query("SELECT id,name,product_id FROM PRODUCTOS",conn)
+    df_orders=df[['Order ID','Postal Code','Product ID','Sales','Quantity','Discount','Profit','Shipping Cost','Order Priority']].dropna().drop_duplicates()
     df_orders['Postal Code'] = df_orders['Postal Code'].astype(str)
-    df_orders = df_orders.drop_duplicates()
-    list_tuples = [tuple(x) for x in df_orders.to_records(index=False)]
+    print('shape orders',df_orders.shape)
+    df_newOrders=df_orders.merge(df_products,how="left",left_on="Product ID",right_on="product_id")
+    df_newOrders=df_newOrders.drop_duplicates()
+    print('shape orders 1',df_newOrders.shape)
+    df_newOrders=df_newOrders[['Order ID','Postal Code','id','Sales','Quantity','Discount','Profit','Shipping Cost','Order Priority']]
+    list_tuples=[tuple(x) for x in df_newOrders.to_records(index=False)]
+    return list_tuples
     
     return list_tuples
 
@@ -75,7 +81,7 @@ def insertManyVentas(bd:Database,data):
     bd.insert_many('VENTAS',['order_id','postal_code','product_id','sales_amount','quantity','discount','profit','shipping_cost','order_priority'],data)
 
 
-def GetDatasourceFecha(conn):
+def GetDatasourceFecha():
     pathData = "/workspaces/workspacepy01/proyecto/files/data.xls"
     df = pd.read_excel(pathData, sheet_name="Orders")
     df['Order Date'] = pd.to_datetime(df['Order Date'], errors='coerce').dt.strftime('%Y-%m-%d')
